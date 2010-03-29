@@ -2,6 +2,7 @@ $LOAD_PATH.unshift File.expand_path( File.dirname(__FILE__) + '/../lib')
 
 require 'shoulda'
 require 'psm'
+require 'artifice'
 
 class PrintStuffMailTest < Test::Unit::TestCase
   
@@ -28,7 +29,8 @@ class PrintStuffMailTest < Test::Unit::TestCase
       end
       
       should "raise unless a 'confirm block' is passed (it's a really dangerous method)" do
-        assert_raise(SecurityError) { PSM.mail!(@message, @address) }
+        assert_raise(LocalJumpError) { PSM.mail!(@message, @address) }
+        assert_raise(SecurityError) { PSM.mail!(@message, @address) {} }
         assert_nothing_raised { PSM.mail!(@message, @address) {|c| c.confirm! } }
       end
       
