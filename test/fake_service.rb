@@ -33,7 +33,7 @@ class FakePSM < Sinatra::Base
   end
   
   post '/letters/print' do
-    halt 400 unless params[:message] and params[:address] and params[:token] == 'abcde'
+    halt 400 unless params[:message] and params[:address] and params[:session] == 'abcde'
     @letter = Letter.new(params[:message], params[:address], params[:return_address])
     { :status => 201, 
       :id => 1,
