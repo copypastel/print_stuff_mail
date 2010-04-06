@@ -7,7 +7,7 @@ module PrintStuffMail
     
     BASE_URL = 'http://copypastel.com' # For now, for testing.
     
-    attr_reader :key, :last_response, :expiration
+    attr_reader :id, :last_response, :expiration
     
     def initialize(account_id)      
       @account_id = account_id
@@ -22,7 +22,7 @@ module PrintStuffMail
       @last_response = get_response
       return false unless @last_response['status'] == 201 # We don't have to error out if we can't renew
       @expiration = DateTime.parse(@last_response['expires'])
-      @key = @last_response['id']
+      @id = @last_response['id']
       true
     end
     
@@ -30,9 +30,11 @@ module PrintStuffMail
       (@expiration - DateTime.now) < 0
     end
     
-    def valid?
+    def active?
       not expired?
     end
+    
+    alias_method :valid?, :active?
     
     private
     
