@@ -1,14 +1,13 @@
-$LOAD_PATH.unshift File.expand_path( File.dirname(__FILE__) + '/../lib')
+require File.expand_path( File.dirname(__FILE__) + '/test_helper')
 
-require 'shoulda'
 require 'psm'
-require 'artifice'
 
 class PrintStuffMailTest < Test::Unit::TestCase
   
   context "PrintStuffMail" do
     
     setup do
+      Artifice.activate_with(FakePSM)
       @address = "Google\n1600 Amphitheatre Parkway\nMountain View, CA 94043"
       @return_address = "Apple\n1 Infinite Loop\nCupertino, CA 95014"
       @message = "Dear Eric,\nStop stealing my designs!\nLove,\nSteve"
@@ -24,29 +23,46 @@ class PrintStuffMailTest < Test::Unit::TestCase
         assert_respond_to PSM, :mail!
       end
       
-      should "raise an ArgumentError unless @message and @address are specified" do
-        assert_raise(ArgumentError) { PSM.mail! }
+      should "allow to set an account_id" do
+        assert_respond_to PSM, :account_id
+        assert_respond_to PSM, :account_id=
       end
       
-      should "raise unless a 'confirm block' is passed (it's a really dangerous method)" do
-        assert_raise(LocalJumpError) { PSM.mail!(@message, @address) }
+      should "raise a SecurityError unless @account_id isn't set" do
         assert_raise(SecurityError) { PSM.mail!(@message, @address) {} }
-        assert_nothing_raised { PSM.mail!(@message, @address) {|c| c.confirm! } }
       end
-      
-      should "accept an optional @return_address" do
-        assert_nothing_raised do 
-          PrintStuffMail.mail!(@message, @address, @return_address) {|c| c.confirm! }
+
+      context "with a set account_id" do
+        
+        setup do
+          PSM.account_id = 'john_smith'
         end
+        
+        should "raise a SecurityError unless a 'confirm block' is passed (it's a really dangerous method)" do
+          assert_raise(SecurityError) { PSM.mail!(@message, @address) {} }
+          assert_nothing_raised { PSM.mail!(@message, @address) {|c| c.confirm! } }
+        end
+        
+        should "raise an ArgumentError unless @message and @address are specified" do
+          assert_raise(ArgumentError) { PSM.mail! }
+          assert_raise(ArgumentError) { PSM.mail!(@message) }
+          assert_nothing_raised { PSM.mail!(@message, @address, &:confirm!) }
+        end
+
+        should "accept an optional @return_address" do
+          assert_nothing_raised do
+            PSM.mail!(@message, @address, @return_address, &:confirm!)
+          end
+        end
+
       end
       
     end
   
     context "as a module to be #include-d" do
       
-      class Tempfile; include PSM end
-      
       setup do
+        class Tempfile; include PSM end
         @tempfile = Tempfile.new
       end
       
@@ -60,9 +76,27 @@ class PrintStuffMailTest < Test::Unit::TestCase
       end
       
       should "raise from within #mail! if #address isn't defined" do
-        assert_raise(NoMethodError) { @tempfile.mail!(@msg) }
+        assert !defined? @tempfile.address
+        assert_raise(NoMethodError) { @tempfile.mail!(@message) }
       end
       
+    end
+    
+    context "when accessing the webservice" do
+      
+      should "post letters" do
+        letter = PSM.mail!(@message, @address, @return_address, &:confirm!)
+        assert_equal 'processing', letter.state
+      end
+      
+      should "be able to update a letter's status" do
+        
+      end
+      
+    end
+    
+    teardown do
+      Artifice.deactivate
     end
     
   end
