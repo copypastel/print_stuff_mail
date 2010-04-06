@@ -1,12 +1,13 @@
 require 'sinatra/base'
+require 'openssl'
 require 'json'
 
-class Letter < Struct(:message, :address, :return_address); end
+class Letter < Struct.new(:message, :address, :return_address); end
 
-class Helpers
+module Helpers
   
-  @@encrypter = OpenSSL::PKey::RSA.new '12345'
-  @@decrypter = OpenSSL::PKey::RSA.new 'abcde'
+  @@encrypter = OpenSSL::PKey::RSA.new
+  @@decrypter = OpenSSL::PKey::RSA.new
   
   def encrypt(payload)
     CGI.escape @@encrypter.private_encrypt(params.to_json)
@@ -18,13 +19,21 @@ class Helpers
   
 end
 
-class Sessions < Sinatra::Base
+class FakePSM < Sinatra::Base
   
   # may be extend
   include Helpers
   
-  post '/letter/print' do
-    halt 400 unless params[:message] and params[:address]
+  post '/sessions' do
+    halt 400 unless params[:account_id] == 'john_smith'
+    { :status => 201,
+      :id => 'abcde',
+      :expires => Time.now + 60*30
+      }.to_json
+  end
+  
+  post '/letters/print' do
+    halt 400 unless params[:message] and params[:address] and params[:token] == 'abcde'
     @letter = Letter.new(params[:message], params[:address], params[:return_address])
     { :status => 201, 
       :id => 1,
@@ -34,13 +43,14 @@ class Sessions < Sinatra::Base
       :state => :processing }.to_json
   end
   
-  get '/letter/:id' do
+  get '/letters/:id' do
+    halt 400 unless params[:token] == 'abcde'
     halt 404 if @letter.nil? or params[:id].to_i != 1
     { :status => 200,
       :id => 1,
       :message => @letter.message,
       :address => @letter.address,
-      :return_address @letter.return_address,
+      :return_address => @letter.return_address,
       :state => :processing }.to_json
   end
   
