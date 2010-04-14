@@ -24,7 +24,7 @@ module PrintStuffMail
     
   end
 
-  BASE_URL = "copypastel.com"
+  BASE_URL = "s.copypastel.com"
 
   class Confirmation
     def initialize; @confirmed = false end
@@ -52,14 +52,14 @@ module PrintStuffMail
     end
 
     def post_letter(message, address, return_address = nil)
-      uri = Addressable::URI.new  :host => 'copypastel.com', 
+      uri = Addressable::URI.new  :host => PSM::BASE_URL,
                                   :path => '/letters'
       params = { :message => message, :address => address, 
                  :return_address => return_address,
                  :session => @session.id }
       uri.query_values = params
-      response = Net::HTTP.start("copypastel.com", 80) do |http|
-        http.post("/letters/print", uri.query)
+      response = Net::HTTP.start(PSM::BASE_URL, 80) do |http|
+        http.post("/psm/letters/print", uri.query)
       end
       JSON.parse response.body
     end
