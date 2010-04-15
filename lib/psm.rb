@@ -57,6 +57,7 @@ module PrintStuffMail
       params = { :message => message, :address => address, 
                  :return_address => return_address,
                  :session => @session.id }
+      params.delete_if {|k, v| v.nil?}
       uri.query_values = params
       response = Net::HTTP.start(PSM::BASE_URL, 80) do |http|
         http.post("/psm/letters/print", uri.query)
