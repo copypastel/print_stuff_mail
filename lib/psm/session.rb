@@ -1,8 +1,13 @@
 require 'net/http'
 require 'date'
+
+# dependencies
 require 'json'
 
 module PrintStuffMail
+  
+  BASE_URL = 's.copypastel.com/psm'
+  
   class Session
     
     attr_reader :id, :last_response, :expiration
@@ -39,8 +44,8 @@ module PrintStuffMail
     def get_response
       query = "account_id=#{@account_id}"
       begin
-        response = Net::HTTP.start(PSM::BASE_URL,80) do |http|
-          http.post("/psm/sessions", query)
+        response = Net::HTTP.start(PrintStuffMail::BASE_URL,80) do |http|
+          http.post("/sessions", query)
         end
         JSON.parse(response.body)
       rescue

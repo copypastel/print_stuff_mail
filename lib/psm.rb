@@ -1,13 +1,13 @@
 require 'net/http'
-require 'base64'
-require 'json'
-
-require 'addressable/uri'
 require 'psm/session'
+
+# dependencies
+require 'addressable/uri'
+require 'json'
 
 module PrintStuffMail
 
-  BASE_URL = "s.copypastel.com"
+  BASE_URL = 's.copypastel.com/psm'
 
   class Confirmation
     def initialize; @confirmed = false end
@@ -20,12 +20,13 @@ module PrintStuffMail
     
     def mail!( message, address, return_address = nil )
       raise(SecurityError, 'no account_id set.') unless account_id
+      raise(SecurityError, 'need to confirm!') unless block_given?
       yield c = Confirmation.new
       raise(SecurityError, 'need to confirm!') unless c.confirmed?
       
       @session ||= Session.new account_id
       raise unless @session.active? or @session.renew! # needs an error type
-      Letter.new post_letter(message, address, return_address)
+      post_letter(message, address, return_address)
     end
     
     private
@@ -36,14 +37,14 @@ module PrintStuffMail
 
     def post_letter(message, address, return_address = nil)
       uri = Addressable::URI.new  :host => PSM::BASE_URL,
-                                  :path => '/letters'
+                                  :path => '/letters/print'
       params = { :message => message, :address => address, 
                  :return_address => return_address,
                  :session => @session.id }
       params.delete_if {|k, v| v.nil?}
       uri.query_values = params
-      response = Net::HTTP.start(PSM::BASE_URL, 80) do |http|
-        http.post("/psm/letters/print", uri.query)
+      response = Net::HTTP.start(PrintStuffMail::BASE_URL, 80) do |http|
+        http.post(uri.path, uri.query)
       end
       JSON.parse response.body
     end
@@ -52,23 +53,6 @@ module PrintStuffMail
   
   def mail!( message, return_address = nil, &block )
     PSM.mail!( message, self.address, return_address, block)
-  end
-  
-  private
-
-  def encrypt(params)
-    @encrypter ||= OpenSSL::PKey::RSA.new SECRET_KEY
-    decrypter.public_encrypt params.to_json
-    @psm_encrypter.public_encrypt params[:payload]
-  end
-  
-  def decrypt(params)
-    if payload = params.delete(:payload)
-      escaped = CGI.unescape(payload)
-      add_params = JSON.parse @psm_decrypter.private_decrypt(escaped)
-      params.merge add_params
-    end
-    params
   end
 
 end
