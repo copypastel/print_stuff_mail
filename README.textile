@@ -4,11 +4,7 @@ p. Print Stuff Mail is snail mail webservice, allowing physical letters to be se
 
 h2. Installation
 
-<pre>
-  <code>
-    gem install psm
-  </code>
-</pre>
+@gem install psm@
 
 That's it.
 
