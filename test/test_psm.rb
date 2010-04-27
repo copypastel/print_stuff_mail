@@ -86,10 +86,10 @@ class PrintStuffMailTest < Test::Unit::TestCase
       
       should "post letters" do
         letter = PSM.mail!(@message, @address, @return_address, &:confirm!)
-        assert_equal 'processing', letter.state
+        assert_equal 'processing', letter['state']
       end
       
-      should "be able to update a letter's status" do
+      should_eventually "be able to update a letter's status" do
         
       end
       
