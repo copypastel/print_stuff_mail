@@ -1,0 +1,35 @@
+h2. Smail Webservice
+
+p. Print Stuff Mail is snail mail webservice, allowing physical letters to be sent from the comfort of your own command line.
+
+h2. Installation
+
+<pre>
+  <code>
+    gem install psm
+  </code>
+</pre>
+
+That's it.
+
+h2. Example
+
+<pre>
+  <code>
+    require 'psm'
+    
+    # PrintStuffMail, aliased as PSM, is our namespace.
+    # 1. set your account id.
+    PSM.account_id = 'abcdefg' 
+    
+    # 2. mail a letter!
+    # Since this method will eventually cause a credit card to be charged
+    # we've taken extra precautions to label it as dangerous. The exclamation,
+    # for one, calls attention to the method, but furthermore a block has to be
+    # passed in "confirming" the method.
+    PSM.mail!( 'message', 'address', 'return_address') {|c| c.confirm!}
+    
+    # 3. there is no step three.
+  </code>
+</pre>
+
