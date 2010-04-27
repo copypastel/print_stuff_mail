@@ -24,7 +24,7 @@ class FakePSM < Sinatra::Base
   # may be extend
   include Helpers
   
-  post '/sessions' do
+  post '/psm/sessions' do
     halt 400 unless params[:account_id] == 'john_smith'
     { :status => 201,
       :id => 'abcde',
@@ -32,7 +32,7 @@ class FakePSM < Sinatra::Base
       }.to_json
   end
   
-  post '/letters/print' do
+  post '/psm/letters/print' do
     halt 400 unless params[:message] and params[:address] and params[:session] == 'abcde'
     @letter = Letter.new(params[:message], params[:address], params[:return_address])
     { :status => 201, 
@@ -43,7 +43,7 @@ class FakePSM < Sinatra::Base
       :state => :processing }.to_json
   end
   
-  get '/letters/:id' do
+  get '/psm/letters/:id' do
     halt 400 unless params[:token] == 'abcde'
     halt 404 if @letter.nil? or params[:id].to_i != 1
     { :status => 200,
