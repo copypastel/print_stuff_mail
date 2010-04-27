@@ -7,23 +7,6 @@ require 'psm/session'
 
 module PrintStuffMail
 
-  class Letter
-    
-    attr_reader :address, :return_address, :message, :state
-    
-    def initialize(params = {})
-      @message = params['message']
-      @address = params['address']
-      @return_address = params['return_address']
-      @state = params['state']
-    end
-    
-    def update_status
-      
-    end
-    
-  end
-
   BASE_URL = "s.copypastel.com"
 
   class Confirmation
