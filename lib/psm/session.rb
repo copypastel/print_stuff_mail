@@ -6,7 +6,7 @@ require 'json'
 
 module PrintStuffMail
   
-  BASE_URL = 's.copypastel.com/psm'
+  BASE_URL = 's.copypastel.com' unless defined?(BASE_URL)
   
   class Session
     
@@ -23,6 +23,7 @@ module PrintStuffMail
     
     def renew!
       @last_response = get_response
+      puts @last_response
       return false unless @last_response['status'] == 201 # We don't have to error out if we can't renew
       @expiration = DateTime.parse(@last_response['expires'])
       @id = @last_response['id']
@@ -45,7 +46,7 @@ module PrintStuffMail
       query = "account_id=#{@account_id}"
       begin
         response = Net::HTTP.start(PrintStuffMail::BASE_URL,80) do |http|
-          http.post("/sessions", query)
+          http.post("/psm/sessions", query)
         end
         JSON.parse(response.body)
       rescue
