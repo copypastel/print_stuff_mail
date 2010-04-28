@@ -23,7 +23,6 @@ module PrintStuffMail
     
     def renew!
       @last_response = get_response
-      puts @last_response
       return false unless @last_response['status'] == 201 # We don't have to error out if we can't renew
       @expiration = DateTime.parse(@last_response['expires'])
       @id = @last_response['id']
