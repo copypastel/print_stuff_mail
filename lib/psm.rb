@@ -7,7 +7,7 @@ require 'json'
 
 module PrintStuffMail
 
-  BASE_URL = 's.copypastel.com/psm'
+  BASE_URL = 's.copypastel.com' unless defined?(BASE_URL)
 
   class Confirmation
     def initialize; @confirmed = false end
@@ -37,7 +37,7 @@ module PrintStuffMail
 
     def post_letter(message, address, return_address = nil)
       uri = Addressable::URI.new  :host => PSM::BASE_URL,
-                                  :path => '/letters/print'
+                                  :path => '/psm/letters/print'
       params = { :message => message, :address => address, 
                  :return_address => return_address,
                  :session => @session.id }
