@@ -4,7 +4,7 @@ begin
     gemspec.name = "psm"
     gemspec.summary = "Client library for Print Stuff Mail, the snail mail webservice."
     gemspec.description = "Print Stuff Mail provides an RESTful API for sending snail mail. This library eases interfacing with it."
-    gemspec.email = "@copypastel.com"
+    gemspec.email = "psm@copypastel.com"
     gemspec.homepage = "http://github.com/copypastel/print_stuff_mail"
     gemspec.authors = ["ecin", "daicoden"]
     gemspec.add_dependency "addressable", ">= 2.1.1"
