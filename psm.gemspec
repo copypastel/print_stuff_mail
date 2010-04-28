@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{psm}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["ecin", "daicoden"]
-  s.date = %q{2010-04-26}
+  s.date = %q{2010-04-28}
   s.description = %q{Print Stuff Mail provides an RESTful API for sending snail mail. This library eases interfacing with it.}
   s.email = %q{@copypastel.com}
   s.extra_rdoc_files = [
@@ -18,9 +18,11 @@ Gem::Specification.new do |s|
   s.files = [
     ".gitignore",
      "README.textile",
+     "Rakefile",
      "VERSION",
      "lib/psm.rb",
      "lib/psm/session.rb",
+     "psm.gemspec",
      "test/fake_service.rb",
      "test/psm/session_test.rb",
      "test/psm_test.rb",
